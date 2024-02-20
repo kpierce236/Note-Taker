@@ -58,6 +58,39 @@ app.post('/api/notes', (req, res) => {
       });
     });
   });
+
+  // Route to delete a note by ID
+app.delete('/api/notes/:id', (req, res) => {
+    const noteId = parseInt(req.params.id); // Parse note ID from URL parameter
+  
+    fs.readFile(path.join(__dirname, 'db', 'db.json'), 'utf8', (err, data) => {
+      if (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to read data from the database.' });
+        return;
+      }
+  
+      let notes = JSON.parse(data);
+      const updatedNotes = notes.filter(note => note.id !== noteId); // Filter out the note to be deleted
+  
+      // Check if the note was found and deleted
+      if (notes.length === updatedNotes.length) {
+        res.status(404).json({ error: 'Note not found.' });
+        return;
+      }
+  
+      // Write updated notes back to the database file
+      fs.writeFile(path.join(__dirname, 'db', 'db.json'), JSON.stringify(updatedNotes), (err) => {
+        if (err) {
+          console.error(err);
+          res.status(500).json({ error: 'Failed to write data to the database.' });
+          return;
+        }
+  
+        res.status(200).json({ message: 'Note deleted successfully.' });
+      });
+    });
+  });
   
   // Function to generate a unique ID
   function generateUniqueId(notes) {
