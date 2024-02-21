@@ -1,4 +1,4 @@
-# Code Quiz
+# Note-Taker
 
 ## Description
 
